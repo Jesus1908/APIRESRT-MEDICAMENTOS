@@ -40,3 +40,20 @@ export const getMedicamentosByTipo = async (req, res) => {
 
   res.json(rows);
 };
+
+
+export const deleteMedicamentosById = async (req, res) => {
+  const [rows] = await pool.query("SELECT receta FROM medicamentos WHERE id = ?", [req.params.id]);
+  if (rows.length === 0) {
+    return res.status(404).json({
+      message: "No existe registro con este ID"
+    });
+  }
+  if (rows[0].receta === 'S') {
+    return res.status(403).json({
+      message: "No se puede eliminar un medicamento que requiere receta"
+    });
+  }
+  const [result] = await pool.query("DELETE FROM medicamentos WHERE id = ?", [req.params.id]);
+  return res.sendStatus(204); 
+};
