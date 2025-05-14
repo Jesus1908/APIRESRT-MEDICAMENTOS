@@ -41,6 +41,31 @@ export const getMedicamentosByTipo = async (req, res) => {
   res.json(rows);
 };
 
+export const createMedicamentos = async (req, res) => {
+  const { tipo, nombre, nomComercial, presentacion, receta, precio } = req.body;
+
+  if (precio <= 0) {
+    return res.status(400).json({
+      message: "El precio no puede ser 0 o negativo"
+    });
+  }
+
+  const [rows] = await pool.query(
+    "INSERT INTO medicamentos (tipo, nombre, nomComercial, presentacion, receta, precio) VALUES (?,?,?,?,?,?)",
+    [tipo, nombre, nomComercial, presentacion, receta, precio]
+  );
+
+  res.send({
+    id: rows.insertId,
+    tipo,
+    nombre,
+    nomComercial,
+    presentacion,
+    receta,
+    precio
+  });
+};
+
 
 export const deleteMedicamentosById = async (req, res) => {
   const [rows] = await pool.query("SELECT receta FROM medicamentos WHERE id = ?", [req.params.id]);
