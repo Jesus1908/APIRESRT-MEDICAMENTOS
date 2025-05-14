@@ -67,6 +67,35 @@ export const createMedicamentos = async (req, res) => {
 };
 
 
+export const updateMedicamentos = async (req, res) => {
+  const id = req.params.id
+  const {tipo, nombre, nomComercial, presentacion, receta, precio} =  req.body
+
+  if (precio <= 0) {
+    return res.status(400).json({
+      message: "El precio no puede ser 0 o negativo"
+    });
+  }
+  const querySQL = `
+  UPDATE medicamentos SET
+    tipo = ?,
+    nombre = ?,
+    nomComercial = ?,
+    presentacion = ?,
+    receta = ?,
+    precio = ?
+  WHERE id = ?
+  `
+  const [result] = await pool.query(querySQL, [tipo, nombre, nomComercial, presentacion, receta, precio, id])
+
+  if (result.affectedRows == 0) {
+    return res.status(404).json({
+      message: 'El ID no existe'
+    })
+  }
+  res.json({ message: 'Actualización correcta'})
+}
+
 export const deleteMedicamentosById = async (req, res) => {
   const [rows] = await pool.query("SELECT receta FROM medicamentos WHERE id = ?", [req.params.id]);
   if (rows.length === 0) {
